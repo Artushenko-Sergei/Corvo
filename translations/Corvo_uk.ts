@@ -430,6 +430,10 @@
         <translation>Запускати під час входу в систему</translation>
     </message>
     <message>
+        <source>В версии Flatpak автозапуск настраивается средствами системы: добавьте Corvo в автозапуск в настройках рабочего стола.</source>
+        <translation>У версії Flatpak автозапуск налаштовується засобами системи: додайте Corvo до автозапуску в налаштуваннях стільниці.</translation>
+    </message>
+    <message>
         <source>Уведомления и устройства</source>
         <translation>Повідомлення та пристрої</translation>
     </message>

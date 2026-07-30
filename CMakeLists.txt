@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.21)
 
 project(Corvo
-    VERSION 2.0.0
+    VERSION 2.0.1
     DESCRIPTION "Native WhatsApp Web client for Linux (Qt 6 / Qt WebEngine)"
     HOMEPAGE_URL "https://github.com/Artushenko-Sergei/Corvo"
     LANGUAGES CXX)
@@ -29,7 +29,7 @@ project(Corvo
 # file, the icons and the AppStream metadata must all carry this name.
 set(CORVO_APP_ID "io.github.artushenko_sergei.Corvo")
 
-set(CORVO_BUILD 28)
+set(CORVO_BUILD 29)
 set(CORVO_VERSION_FULL "${PROJECT_VERSION}+${CORVO_BUILD}")
 
 set(CMAKE_CXX_STANDARD 17)

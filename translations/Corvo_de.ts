@@ -430,6 +430,10 @@ Versuch %2 von %3. Details im Protokoll: %4</translation>
         <translation>Beim Anmelden starten</translation>
     </message>
     <message>
+        <source>В версии Flatpak автозапуск настраивается средствами системы: добавьте Corvo в автозапуск в настройках рабочего стола.</source>
+        <translation>In der Flatpak-Version wird der Autostart vom System verwaltet: fügen Sie Corvo in den Einstellungen Ihrer Arbeitsumgebung zum Autostart hinzu.</translation>
+    </message>
+    <message>
         <source>Уведомления и устройства</source>
         <translation>Benachrichtigungen und Geräte</translation>
     </message>
