@@ -1,8 +1,9 @@
 # Flatpak manifest for Corvo.
 #
-# The KDE runtime already contains Qt 6.11 including QtWebEngine, so nothing has
-# to be bundled: the resulting package is small and the version requirement of
-# the project (Qt >= 6.11) is satisfied by the runtime itself.
+# The KDE runtime provides Qt 6.11 but NOT QtWebEngine - verified by looking for
+# libQt6WebEngineCore in org.kde.Sdk/6.11, which is not there. WebEngine comes
+# from the official io.qt.qtwebengine.BaseApp instead, which installs it into
+# /app; its branch has to match the runtime version.
 #
 # Build and install locally with:
 #   flatpak install --user flathub org.kde.Sdk//6.11 org.kde.Platform//6.11
@@ -13,6 +14,8 @@ app-id: io.github.artushenko_sergei.Corvo
 runtime: org.kde.Platform
 runtime-version: "6.11"
 sdk: org.kde.Sdk
+base: io.qt.qtwebengine.BaseApp
+base-version: "6.11"
 command: Corvo
 
 finish-args:
@@ -35,8 +38,17 @@ finish-args:
   - --filesystem=xdg-download
   - --filesystem=xdg-pictures
   - --filesystem=xdg-documents
-  # Autostart entry written by the settings dialog
-  - --filesystem=xdg-config/autostart:create
+  # No access to ~/.config/autostart on purpose: inside a sandbox autostart is
+  # the job of the org.freedesktop.portal.Background portal, and Flathub rejects
+  # the direct file access ("finish-args-unnecessary-xdg-config-autostart-create-access").
+  # Until the portal is implemented the setting is disabled in Flatpak builds.
+  # QtWebEngine lives in /app (from the BaseApp), so its helper process and
+  # spell-check dictionaries have to be looked up there.
+  - --env=QTWEBENGINEPROCESS_PATH=/app/bin/QtWebEngineProcess
+  - --env=QTWEBENGINE_DICTIONARIES_PATH=/app/qtwebengine_dictionaries
+
+cleanup-commands:
+  - /app/cleanup-BaseApp.sh
 
 cleanup:
   - /include
@@ -50,9 +62,17 @@ modules:
     buildsystem: cmake-ninja
     config-opts:
       - -DCMAKE_BUILD_TYPE=Release
+      # Qt comes from the BaseApp in /app, not from the host installation the
+      # project defaults to.
+      - -DCMAKE_PREFIX_PATH=/app;/usr
     sources:
       - type: dir
         path: ../..
+        skip:
+          - build
+          - build-flatpak
+          - .flatpak-builder
+          - .git
     post-install:
       # Flathub keys everything off the application id.
       - install -Dm644 packaging/io.github.artushenko_sergei.Corvo.metainfo.xml

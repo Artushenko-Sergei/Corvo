@@ -430,6 +430,10 @@ Attempt %2 of %3. Details in the log: %4</translation>
         <translation>Start on login</translation>
     </message>
     <message>
+        <source>В версии Flatpak автозапуск настраивается средствами системы: добавьте Corvo в автозапуск в настройках рабочего стола.</source>
+        <translation>In the Flatpak build autostart is configured by the system: add Corvo to the startup applications in your desktop settings.</translation>
+    </message>
+    <message>
         <source>Уведомления и устройства</source>
         <translation>Notifications and devices</translation>
     </message>

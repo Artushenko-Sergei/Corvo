@@ -150,6 +150,12 @@ public:
     void setCustomUserAgent(const QString &userAgent);
 
     // ---- Autostart --------------------------------------------------------
+    /**
+     * False inside a Flatpak sandbox: writing ~/.config/autostart directly is
+     * not allowed there (that is what org.freedesktop.portal.Background is for),
+     * so the setting is presented as unavailable instead of silently failing.
+     */
+    static bool autostartSupported();
     /// True when ~/.config/autostart/Corvo.desktop exists.
     bool autostartEnabled() const;
     /// Writes or removes the autostart .desktop file. Returns false on I/O error.
