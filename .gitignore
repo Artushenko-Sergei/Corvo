@@ -23,3 +23,6 @@ compile_commands.json
 # OS noise
 .DS_Store
 *~
+
+# Готовые пакеты
+dist/

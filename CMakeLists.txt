@@ -29,7 +29,7 @@ project(Corvo
 # file, the icons and the AppStream metadata must all carry this name.
 set(CORVO_APP_ID "io.github.artushenko_sergei.Corvo")
 
-set(CORVO_BUILD 30)
+set(CORVO_BUILD 31)
 set(CORVO_VERSION_FULL "${PROJECT_VERSION}+${CORVO_BUILD}")
 
 set(CMAKE_CXX_STANDARD 17)
@@ -164,7 +164,16 @@ if(_qt_core_location)
     get_filename_component(CORVO_QT_LIBDIR "${_qt_core_location}" DIRECTORY)
 endif()
 
-if(CORVO_QT_LIBDIR AND NOT CORVO_QT_LIBDIR MATCHES "^/(usr|lib)")
+# Self-contained package (scripts/make-bundle-deb.sh): Qt sits next to the
+# binary in /opt/corvo, so the RPATH must be relative rather than absolute.
+option(CORVO_BUNDLE "Link for a self-contained package: RPATH \$ORIGIN/../lib" OFF)
+
+if(CORVO_BUNDLE)
+    set_target_properties(Corvo PROPERTIES
+        INSTALL_RPATH "$ORIGIN/../lib"
+        BUILD_WITH_INSTALL_RPATH OFF)
+    message(STATUS "Install RPATH set to \$ORIGIN/../lib (self-contained bundle)")
+elseif(CORVO_QT_LIBDIR AND NOT CORVO_QT_LIBDIR MATCHES "^/(usr|lib)")
     set_target_properties(Corvo PROPERTIES
         INSTALL_RPATH "${CORVO_QT_LIBDIR}"
         BUILD_WITH_INSTALL_RPATH OFF)
