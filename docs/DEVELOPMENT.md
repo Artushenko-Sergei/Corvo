@@ -268,8 +268,8 @@ dpkg-deb -x build/Corvo_2.0.1+30_amd64.deb /tmp/t
 
 | Вариант | Что даёт | Размер | Состояние |
 |---|---|---|---|
-| **Flatpak** | Qt и WebEngine из рантайма KDE + BaseApp | ~30 МБ + рантайм | ✅ собран, см. ниже |
-| **Самодостаточный .deb** (`/opt/corvo` + `RPATH $ORIGIN/../lib`) | привычная установка через `apt` без Flatpak | ~250 МБ | не собран |
+| **Самодостаточный .deb** (`/opt/corvo`) | установка через `apt` на любой системе | 90 МБ пакет, 340 МБ на диске | ✅ `scripts/make-bundle-deb.sh` |
+| **Flatpak** | Qt и WebEngine из рантайма KDE + BaseApp | ~30 МБ + рантайм | ✅ см. раздел 6b |
 | **AppImage** (`linuxdeploy` + `linuxdeploy-plugin-qt`) | один файл на любом дистрибутиве | ~250 МБ | не собран |
 
 Сборка `dpkg-buildpackage` из каталога `debian/` рассчитана на дистрибутив, где
@@ -277,7 +277,65 @@ Qt ≥ 6.11 есть в репозитории (Debian trixie/sid).
 
 ---
 
-## 6a. Flatpak
+## 6a. Самодостаточный .deb
+
+```bash
+scripts/make-bundle-deb.sh          # -> dist/corvo_<версия>_amd64.deb
+```
+
+Скрипт собирает проект с `-DCORVO_BUNDLE=ON` и складывает рядом с бинарником те
+части Qt, которые действительно нужны, — 23 библиотеки из ~200 и 22 плагина:
+
+```
+/opt/corvo/bin/Corvo            RPATH $ORIGIN/../lib
+/opt/corvo/bin/qt.conf          Prefix = ..
+/opt/corvo/lib/                 libQt6*, libicu*
+/opt/corvo/libexec/QtWebEngineProcess
+/opt/corvo/plugins/             platforms, wayland-*, tls, imageformats, ...
+/opt/corvo/resources/           icudtl.dat, *.pak, v8_context_snapshot.bin
+/opt/corvo/translations/        qtbase_*.qm, qtwebengine_locales/
+/usr/bin/corvo -> /opt/corvo/bin/Corvo
+/usr/share/{applications,icons,metainfo}/io.github.artushenko_sergei.Corvo.*
+/etc/apparmor.d/corvo
+```
+
+Патчить ELF не требуется: библиотеки и плагины Qt используют
+`$ORIGIN`-относительные RUNPATH (`$ORIGIN`, `$ORIGIN/../lib`,
+`$ORIGIN/../../lib`), поэтому достаточно повторить раскладку Qt.
+
+Список библиотек строится обходом `ldd` от бинарника **из каталога сборки** —
+у него RPATH ведёт в Qt. У пакетного RPATH `$ORIGIN/../lib`, и до наполнения
+каталога `ldd` подставил бы системный Qt 6.4.
+
+Плагины через `ldd` не видны и перечислены в скрипте явно. Обязательные:
+`platforms/libqxcb.so`, `platforms/libqwayland.so` (в Qt 6.11 он один, без
+`-generic`), `tls/libqopensslbackend.so`, `networkinformation/libqglib.so`.
+
+Перед упаковкой скрипт проверяет каждый файл: нет ненайденных библиотек, нет
+ссылок на каталог Qt сборочной машины и ни одна `libQt6*`/`libicu*` не
+разрешается в `/usr/lib`. Любое нарушение прерывает сборку.
+
+Зависимости считает `dpkg-shlibdeps` (только системные библиотеки). Пакеты Qt из
+них вырезаются: `libqt6widgets6 (>= 6.11)` нет ни в Debian 12, ни в
+Ubuntu 22.04, и `apt` отказался бы ставить пакет. Для `libasound2` и
+`libglib2.0-0` добавляются альтернативы `| ...t64` — в Ubuntu 24.04 старые имена
+остались только виртуальными пакетами.
+
+`/etc/apparmor.d/corvo` разрешает непривилегированные user namespaces: на
+Ubuntu 24.04+ без этого не запускается песочница Chromium. На Debian 12 профиль
+не загрузится (парсер не знает `abi/4.0`) — установке это не мешает.
+
+Проверка готового пакета без Qt в системе:
+
+```bash
+bwrap --dev-bind / / --tmpfs "$HOME/opt" \
+      --setenv XDG_DATA_HOME /tmp/t/data --setenv XDG_CONFIG_HOME /tmp/t/config \
+      build-bundle/stage/opt/corvo/bin/Corvo
+```
+
+---
+
+## 6b. Flatpak
 
 Манифест — `packaging/flatpak/io.github.artushenko_sergei.Corvo.yaml`.
 
