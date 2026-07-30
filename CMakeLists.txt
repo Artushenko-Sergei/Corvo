@@ -29,7 +29,7 @@ project(Corvo
 # file, the icons and the AppStream metadata must all carry this name.
 set(CORVO_APP_ID "io.github.artushenko_sergei.Corvo")
 
-set(CORVO_BUILD 29)
+set(CORVO_BUILD 30)
 set(CORVO_VERSION_FULL "${PROJECT_VERSION}+${CORVO_BUILD}")
 
 set(CMAKE_CXX_STANDARD 17)
