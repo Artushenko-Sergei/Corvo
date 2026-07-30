@@ -1,0 +1,25 @@
+[Desktop Entry]
+Type=Application
+# Version of the Desktop Entry Specification this file follows - NOT the
+# application version. Do not touch it when bumping the project version.
+Version=1.0
+Name=Corvo
+GenericName=WhatsApp Client
+GenericName[ru]=Клиент WhatsApp
+Comment=Unofficial WhatsApp Web client for Linux
+Comment[ru]=Неофициальный клиент WhatsApp Web для Linux
+Exec=/usr/bin/Corvo
+TryExec=/usr/bin/Corvo
+Icon=io.github.artushenko_sergei.Corvo
+Terminal=false
+Categories=Network;InstantMessaging;Qt;
+Keywords=whatsapp;chat;messenger;im;
+Keywords[ru]=ватсап;чат;мессенджер;
+StartupNotify=true
+StartupWMClass=Corvo
+Actions=Tray;
+
+[Desktop Action Tray]
+Name=Start in tray
+Name[ru]=Запустить в трее
+Exec=/usr/bin/Corvo --hidden

@@ -1,0 +1,37 @@
+Source: corvo
+Section: net
+Priority: optional
+Maintainer: Serhii Artiushenko <artushenko@protonmail.com>
+# The application requires the QWebEnginePermission API (Qt 6.8+) and
+# PersistentPermissionsPolicy (6.9+), so this source package can only be built on
+# a distribution that ships Qt 6.11 or newer - Debian trixie/sid, not bookworm.
+# On bookworm build against a Qt installed from the official installer instead:
+#   cmake -S . -B build -G Ninja -DCMAKE_PREFIX_PATH=$HOME/opt/Qt/6.11.1/gcc_64
+Build-Depends: debhelper-compat (= 13),
+               cmake (>= 3.21),
+               ninja-build,
+               pkgconf,
+               qt6-base-dev (>= 6.11),
+               qt6-base-dev-tools,
+               qt6-webengine-dev (>= 6.11),
+               qt6-webengine-dev-tools
+Standards-Version: 4.6.2
+Homepage: https://github.com/Artushenko-Sergei/Corvo
+Rules-Requires-Root: no
+
+Package: corvo
+Architecture: amd64
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Recommends: libnotify-bin, fonts-noto-color-emoji
+Suggests: pipewire | pulseaudio
+Description: Native WhatsApp Web client for Linux
+ Corvo wraps web.whatsapp.com in a Qt 6 WebEngine window with proper
+ desktop integration instead of a plain browser tab.
+ .
+ Features:
+  * persistent session storage - the QR code is scanned only once;
+  * system tray icon with an unread-message badge and status;
+  * desktop notifications through org.freedesktop.Notifications;
+  * camera and microphone permissions granted automatically for video calls;
+  * built-in camera/microphone diagnostics page;
+  * autostart support and remembered window geometry.

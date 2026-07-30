@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Corvo - проверка устройств</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 16px;
+    font: 14px/1.45 "Noto Sans", "DejaVu Sans", sans-serif;
+    background: #111b21; color: #e9edef;
+  }
+  h1 { font-size: 16px; margin: 0 0 12px; color: #25d366; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  button {
+    font: inherit; font-weight: 600; padding: 8px 14px; border: 0; border-radius: 6px;
+    background: #25d366; color: #062d1b; cursor: pointer;
+  }
+  button.secondary { background: #2a3942; color: #e9edef; }
+  button:hover { filter: brightness(1.08); }
+  button:disabled { opacity: .5; cursor: default; filter: none; }
+  .panes { display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap; }
+  #preview {
+    width: 320px; height: 240px; background: #0b141a; border: 1px solid #2a3942;
+    border-radius: 8px; object-fit: cover;
+  }
+  #devices { flex: 1 1 320px; min-width: 300px; }
+  .group { margin-bottom: 12px; }
+  .group h2 {
+    font-size: 12px; text-transform: uppercase; letter-spacing: .06em;
+    color: #8696a0; margin: 0 0 4px;
+  }
+  ul { margin: 0; padding-left: 18px; }
+  li { margin: 2px 0; word-break: break-word; }
+  li .id { color: #667781; font-size: 12px; }
+  .meter { height: 10px; background: #2a3942; border-radius: 5px; overflow: hidden; width: 320px; }
+  .meter > div { height: 100%; width: 0; background: #25d366; transition: width .05s linear; }
+  #status { margin-top: 12px; padding: 8px 10px; border-radius: 6px; background: #202c33; }
+  .err { color: #f15c6d; }
+  .ok { color: #25d366; }
+</style>
+</head>
+<body>
+
+<h1 data-i18n="title">Проверка камеры и микрофона</h1>
+
+<div class="row">
+  <button id="btn-enumerate" data-i18n="enumerate">Проверить устройства</button>
+  <button id="btn-camera" class="secondary" data-i18n="camera">Включить камеру</button>
+  <button id="btn-mic" class="secondary" data-i18n="mic">Проверить микрофон</button>
+  <button id="btn-stop" class="secondary" disabled data-i18n="stop">Остановить</button>
+</div>
+
+<div class="panes">
+  <div>
+    <video id="preview" autoplay playsinline muted></video>
+    <div class="meter" style="margin-top:8px"><div id="level"></div></div>
+  </div>
+  <div id="devices"><em style="color:#8696a0" data-i18n="notRequested">Список устройств пока не запрашивался.</em></div>
+</div>
+
+<div id="status" data-i18n="ready">Готово к проверке.</div>
+
+<script>
+"use strict";
+
+const RESULT_PREFIX = "CORVO-RESULT:";   // read by DeviceCheckDialog via titleChanged
+
+/**
+ * Strings are injected from C++ (DeviceCheckDialog) so the page follows the
+ * application language instead of carrying its own translations. Until that
+ * happens the markup keeps the Russian source text.
+ */
+let STR = {};
+window.corvoSetStrings = function (strings) {
+  STR = strings || {};
+  document.querySelectorAll("[data-i18n]").forEach((el) => {
+    const key = el.getAttribute("data-i18n");
+    if (STR[key]) el.textContent = STR[key];
+  });
+  if (STR.title) document.documentElement.lang = STR.lang || "ru";
+};
+const t = (key, fallback) => (STR[key] !== undefined ? STR[key] : fallback);
+let stream = null;
+let audioCtx = null;
+let rafId = null;
+
+const el = (id) => document.getElementById(id);
+const statusEl = el("status");
+
+function setStatus(text, cls) {
+  statusEl.textContent = text;
+  statusEl.className = cls || "";
+  if (cls === "err") console.error(text); else console.info(text);
+}
+
+/** Publishes the result to the C++ side through the document title. */
+function publish(payload) {
+  document.title = RESULT_PREFIX + JSON.stringify(payload);
+}
+
+function renderDevices(devices) {
+  const kinds = [
+    ["videoinput",  "videoinput " + t("cameras", "(камеры)")],
+    ["audioinput",  "audioinput " + t("microphones", "(микрофоны)")],
+    ["audiooutput", "audiooutput " + t("outputs", "(вывод звука)")]
+  ];
+  const host = el("devices");
+  host.innerHTML = "";
+  for (const [kind, caption] of kinds) {
+    const list = devices.filter((d) => d.kind === kind);
+    const group = document.createElement("div");
+    group.className = "group";
+    const h2 = document.createElement("h2");
+    h2.textContent = caption;
+    group.appendChild(h2);
+    if (list.length === 0) {
+      const p = document.createElement("div");
+      p.className = "err";
+      p.textContent = t("noDevices", "устройств не найдено");
+      group.appendChild(p);
+    } else {
+      const ul = document.createElement("ul");
+      for (const d of list) {
+        const li = document.createElement("li");
+        li.textContent = d.label || t("unnamed", "(без названия - нет разрешения)");
+        const id = document.createElement("div");
+        id.className = "id";
+        id.textContent = "deviceId: " + (d.deviceId || "-");
+        li.appendChild(id);
+        ul.appendChild(li);
+      }
+      group.appendChild(ul);
+    }
+    host.appendChild(group);
+  }
+}
+
+/**
+ * Asks for permission first (labels stay empty until access is granted),
+ * then enumerates every media device.
+ */
+async function enumerate() {
+  el("btn-enumerate").disabled = true;
+  setStatus(t("asking", "Запрашиваем доступ к камере и микрофону..."));
+
+  const errors = [];
+  let probe = null;
+  try {
+    probe = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+  } catch (e) {
+    errors.push("video+audio: " + e.name + " - " + e.message);
+    // Retry separately: a machine may have only one of the two.
+    for (const c of [{ video: true }, { audio: true }]) {
+      try {
+        const s = await navigator.mediaDevices.getUserMedia(c);
+        if (probe) { s.getTracks().forEach((t) => t.stop()); } else { probe = s; }
+      } catch (e2) {
+        errors.push(Object.keys(c)[0] + ": " + e2.name + " - " + e2.message);
+      }
+    }
+  }
+
+  let devices = [];
+  try {
+    devices = await navigator.mediaDevices.enumerateDevices();
+  } catch (e) {
+    errors.push("enumerateDevices: " + e.name + " - " + e.message);
+  }
+
+  // Chromium reports the "default"/"communications" pseudo-devices with an
+  // empty label; give them a readable name so the report is unambiguous.
+  const nameOf = (d) => {
+    if (d.label) return d.label;
+    if (d.deviceId === "default") return t("defaultDevice", "Устройство по умолчанию (default)");
+    if (d.deviceId === "communications") return t("commsDevice", "Устройство для связи (communications)");
+    return "";
+  };
+  const plain = devices.map((d) => ({ kind: d.kind, label: nameOf(d), deviceId: d.deviceId }));
+  renderDevices(plain);
+
+  if (probe) probe.getTracks().forEach((t) => t.stop());
+
+  const cams = plain.filter((d) => d.kind === "videoinput").length;
+  const mics = plain.filter((d) => d.kind === "audioinput").length;
+  if (cams === 0 && mics === 0) {
+    setStatus(t("none", "Устройства не обнаружены. ") + errors.join("; "), "err");
+  } else if (errors.length) {
+    setStatus(t("found", "Найдено камер: ") + cams + t("andMics", ", микрофонов: ") + mics +
+              ". " + t("warnings", "Предупреждения: ") + errors.join("; "));
+  } else {
+    setStatus(t("found", "Найдено камер: ") + cams + t("andMics", ", микрофонов: ") + mics + ".", "ok");
+  }
+
+  publish({ devices: plain, errors: errors });
+  el("btn-enumerate").disabled = false;
+}
+
+function stopAll() {
+  if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+  if (audioCtx) { audioCtx.close(); audioCtx = null; }
+  if (stream) { stream.getTracks().forEach((t) => t.stop()); stream = null; }
+  el("preview").srcObject = null;
+  el("level").style.width = "0";
+  el("btn-stop").disabled = true;
+  setStatus(t("stopped", "Захват остановлен."));
+}
+
+async function startCamera() {
+  stopAll();
+  setStatus(t("openingCamera", "Открываем камеру..."));
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: { width: { ideal: 1280 }, height: { ideal: 720 } },
+      audio: false
+    });
+    el("preview").srcObject = stream;
+    const track = stream.getVideoTracks()[0];
+    const s = track.getSettings();
+    setStatus(t("cameraWorks", "Камера работает: ") + track.label + " (" + (s.width || "?") + "x" +
+              (s.height || "?") + " @ " + (s.frameRate ? Math.round(s.frameRate) : "?") + " fps)",
+              "ok");
+    el("btn-stop").disabled = false;
+    publish({ camera: { label: track.label, settings: s } });
+  } catch (e) {
+    setStatus(t("cameraFailed", "Камера недоступна: ") + e.name + " - " + e.message, "err");
+    publish({ camera: null, errors: [e.name + ": " + e.message] });
+  }
+}
+
+async function startMicrophone() {
+  stopAll();
+  setStatus(t("openingMic", "Открываем микрофон..."));
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+    const track = stream.getAudioTracks()[0];
+    audioCtx = new AudioContext();
+    const analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 1024;
+    audioCtx.createMediaStreamSource(stream).connect(analyser);
+    const buf = new Uint8Array(analyser.frequencyBinCount);
+
+    const tick = () => {
+      analyser.getByteTimeDomainData(buf);
+      let peak = 0;
+      for (let i = 0; i < buf.length; i++) peak = Math.max(peak, Math.abs(buf[i] - 128));
+      el("level").style.width = Math.min(100, (peak / 128) * 140) + "%";
+      rafId = requestAnimationFrame(tick);
+    };
+    tick();
+
+    setStatus(t("micWorks", "Микрофон работает: ") + track.label + " - " + t("saySomething", "скажите что-нибудь."), "ok");
+    el("btn-stop").disabled = false;
+    publish({ microphone: { label: track.label } });
+  } catch (e) {
+    setStatus(t("micFailed", "Микрофон недоступен: ") + e.name + " - " + e.message, "err");
+    publish({ microphone: null, errors: [e.name + ": " + e.message] });
+  }
+}
+
+el("btn-enumerate").addEventListener("click", enumerate);
+el("btn-camera").addEventListener("click", startCamera);
+el("btn-mic").addEventListener("click", startMicrophone);
+el("btn-stop").addEventListener("click", stopAll);
+window.addEventListener("beforeunload", stopAll);
+
+// Entry points invoked from C++ (DeviceCheckDialog).
+window.corvoEnumerate = enumerate;
+window.corvoStartCamera = startCamera;
+window.corvoStopAll = stopAll;
+
+console.info("Device check page ready, userAgent: " + navigator.userAgent);
+</script>
+</body>
+</html>

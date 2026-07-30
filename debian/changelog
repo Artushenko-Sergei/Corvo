@@ -1,0 +1,135 @@
+corvo (2.0.0+28) unstable; urgency=medium
+
+  * Контакты сопровождающего и домашняя страница проекта указаны настоящие (GitHub, artushenko@protonmail.com).
+
+ -- Serhii Artiushenko <artushenko@protonmail.com>  Fri, 31 Jul 2026 00:00:09 +0300
+
+corvo (2.0.0+27) unstable; urgency=medium
+
+  * Подготовка к публикации: LICENSE (MIT), .gitignore, метаданные AppStream, манифест Flatpak на org.kde.Platform 6.11, чистые скриншоты без личных данных. Константы версии и app ID вынесены в src/AppInfo.h — раньше они были объявлены только в Settings.h и файлы не собирались вне проекта.
+
+ -- Serhii Artiushenko <artushenko@protonmail.com>  Thu, 30 Jul 2026 23:07:35 +0300
+
+corvo (2.0.0+26) unstable; urgency=medium
+
+  * Проект переименован в Corvo: новое имя, новая иконка (ворон в полёте), app ID io.github.artushenko_sergei.Corvo, каталоги данных ~/.local/share/Corvo и ~/.config/Corvo. Данные прежних версий переносятся автоматически при первом запуске, сессия WhatsApp сохраняется.
+
+ -- Serhii Artiushenko <artushenko@protonmail.com>  Thu, 30 Jul 2026 22:42:55 +0300
+
+corvo (1.3.4+25) unstable; urgency=medium
+
+  * Заработали звонки WhatsApp: движку не хватало SharedArrayBuffer (нужен WASM-движку звонков; страница не cross-origin isolated) и RTCRtpScriptTransform. Добавлены --enable-features=SharedArrayBuffer и --enable-blink-features=RTCRtpScriptTransform; списки фич теперь объединяются, а не затирают друг друга.
+
+ -- Serhii Artiushenko <artushenko@protonmail.com>  Thu, 30 Jul 2026 15:58:41 +0300
+
+corvo (1.3.3+24) unstable; urgency=medium
+
+  * Исправлено второе падение при смене языка: меню трея больше не пересоздаётся (QSystemTrayIcon::setContextMenu на D-Bus-бэкенде падал в QDBusTrayIcon::updateMenu), а только меняет тексты пунктов.
+
+ -- Serhii Artiushenko <artushenko@protonmail.com>  Thu, 30 Jul 2026 15:09:24 +0300
+
+corvo (1.3.2+23) unstable; urgency=medium
+
+  * Исправлено падение при смене языка на ходу: меню перестраивалось внутри доставки QEvent::LanguageChange. Перестройка отложена на следующий цикл событий и объединена для двух событий подряд.
+
+ -- Serhii Artiushenko <artushenko@protonmail.com>  Thu, 30 Jul 2026 15:06:29 +0300
+
+corvo (1.3.1+22) unstable; urgency=medium
+
+  * Исправлено: строка режима «auto» попадала в resolveLanguage() как код языка, из-за чего интерфейс и Accept-Language уходили в английский и расходились с --lang. Добавлен Settings::effectiveLanguage(), через который считают все три места.
+
+ -- Serhii Artiushenko <artushenko@protonmail.com>  Thu, 30 Jul 2026 15:03:35 +0300
+
+corvo (1.3.0+21) unstable; urgency=medium
+
+  * Интерфейс программы по умолчанию подхватывает язык WhatsApp: страница сообщает его через <html lang>, приложение переключает переводы на ходу (QEvent::LanguageChange) без перезапуска. Ручной выбор языка сохранён как переопределение, вариант «Как в системе» убран.
+
+ -- Serhii Artiushenko <artushenko@protonmail.com>  Thu, 30 Jul 2026 15:00:47 +0300
+
+corvo (1.2.1+20) unstable; urgency=medium
+
+  * Пояснение к языку расположено сразу под полем «Язык», а не под масштабом.
+
+ -- Serhii Artiushenko <artushenko@protonmail.com>  Thu, 30 Jul 2026 14:42:59 +0300
+
+corvo (1.2.1+19) unstable; urgency=medium
+
+  * Пояснение к выбору языка выводится полностью: переносимые метки перенесены из QFormLayout в вертикальный layout, иначе третья строка обрезалась.
+
+ -- Serhii Artiushenko <artushenko@protonmail.com>  Thu, 30 Jul 2026 14:41:50 +0300
+
+corvo (1.2.1+18) unstable; urgency=medium
+
+  * В настройках рядом с выбором языка добавлено пояснение: настройка меняет интерфейс программы, а язык самого WhatsApp приходит с телефона (у WhatsApp Web нет своего выбора языка).
+
+ -- Serhii Artiushenko <artushenko@protonmail.com>  Thu, 30 Jul 2026 14:40:41 +0300
+
+corvo (1.2.1+17) unstable; urgency=medium
+
+  * Смена языка теперь влияет и на веб-интерфейс: выбранный язык передаётся Chromium через --lang (navigator.language) и в заголовке Accept-Language, а также становится QLocale по умолчанию. Раньше и то и другое следовало системной локали.
+
+ -- Serhii Artiushenko <artushenko@protonmail.com>  Thu, 30 Jul 2026 14:31:22 +0300
+
+corvo (1.2.0+16) unstable; urgency=medium
+
+  * В «О программе» добавлены разработчик (Сергей Артюшенко), версия Qt и краткая формулировка о свободной лицензии.
+
+ -- Serhii Artiushenko <artushenko@protonmail.com>  Thu, 30 Jul 2026 14:10:30 +0300
+
+corvo (1.2.0+15) unstable; urgency=medium
+
+  * Диалог «О программе» переписан: только название, версия и назначение; юридическая формулировка про товарный знак убрана из интерфейса (остаётся в README и debian/copyright).
+
+ -- Serhii Artiushenko <artushenko@protonmail.com>  Thu, 30 Jul 2026 14:06:21 +0300
+
+corvo (1.2.0+14) unstable; urgency=medium
+
+  * Заголовок окна только «Corvo»; «Помощь» сведена к одному пункту «О программе» без данных Qt; проверка камеры перенесена в настройки; исправлена иконка (desktopFileName без .desktop) и добавлено создание ярлыка в меню приложений; статус-бар больше не сообщает об успешной загрузке; добавлена локализация (английский, немецкий, украинский) с выбором языка в настройках.
+
+ -- Serhii Artiushenko <artushenko@protonmail.com>  Thu, 30 Jul 2026 13:49:44 +0300
+
+corvo (1.1.0+13) unstable; urgency=medium
+
+  * Требуется Qt 6.11+; поддержка Qt 6.4 и ветка featurePermissionRequested удалены. Пакет собирается как локальный: Qt подключается через RPATH, ложные зависимости от системных Qt-пакетов больше не заявляются.
+
+ -- Serhii Artiushenko <artushenko@protonmail.com>  Thu, 30 Jul 2026 13:17:07 +0300
+
+corvo (1.0.0+12) unstable; urgency=medium
+
+  * Version scheme fixed at SemVer 2.0.0 with a monotonic build number
+    (MAJOR.MINOR.PATCH+BUILD); CMakeLists.txt is the single source of truth and
+    scripts/bump-version.sh performs the bump.
+  * Support for Qt 6.11: permissions migrated to the QWebEnginePermission API
+    (permissionRequested), the deprecated featurePermissionRequested path is kept
+    for Qt < 6.8 so Debian 12's Qt 6.4 still builds.
+  * Persistent permissions policy set to StoreOnDisk on Qt >= 6.9.
+  * User agent is derived from Qt's own instead of being hardcoded: the
+    QtWebEngine token is stripped and the real Chromium version kept.
+  * Window position is no longer persisted on Wayland, where a client cannot
+    position itself - it used to overwrite a valid X11 position with unusable
+    coordinates.
+  * The web profile is created in main() so it outlives every page, as Qt
+    WebEngine requires.
+  * Popup windows (window.open) are parented to the main window and a popup that
+    never navigates is closed instead of lingering invisibly.
+  * Fixed a leak of the tray context menu (QSystemTrayIcon does not take
+    ownership).
+  * Profile storage/cache paths are applied once instead of on every settings
+    change, where Chromium silently ignored them.
+  * Geometry writes are throttled, the window position sentinel handles negative
+    multi-monitor coordinates, and the unused saveState() blob is gone.
+  * CMake warns when a package is built against a Qt outside the distribution,
+    which would produce an installable but unstartable .deb.
+
+ -- Serhii Artiushenko <artushenko@protonmail.com>  Thu, 30 Jul 2026 13:05:00 +0300
+
+corvo (1.0.0+1) unstable; urgency=medium
+
+  * Initial release.
+    - Qt 6 WebEngine wrapper around web.whatsapp.com.
+    - Persistent web profile: the QR code is scanned only once.
+    - Automatic camera/microphone permissions for WebRTC calls.
+    - System tray with unread badge, freedesktop notifications, autostart.
+    - Built-in device diagnostics ("Проверка камеры").
+
+ -- Serhii Artiushenko <artushenko@protonmail.com>  Thu, 30 Jul 2026 11:37:11 +0300
