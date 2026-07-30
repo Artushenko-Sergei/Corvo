@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <title>Corvo</title>
+  <circle cx="128" cy="128" r="120" fill="#0F766E"/>
+  <path d="M20,106 L66,122 L100,144 L128,136 L156,144 L190,122 L236,106 L198,152 L152,172 L128,202 L104,172 L58,152 Z" fill="#F8FAFC"/>
+</svg>

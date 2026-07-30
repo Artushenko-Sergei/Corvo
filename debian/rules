@@ -1,0 +1,18 @@
+#!/usr/bin/make -f
+# Build Corvo with CMake + Ninja under debhelper.
+
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+export QT_SELECT = qt6
+
+%:
+	dh $@ --buildsystem=cmake+ninja
+
+override_dh_auto_configure:
+	dh_auto_configure -- \
+		-DCMAKE_BUILD_TYPE=Release \
+		-DCMAKE_INSTALL_PREFIX=/usr
+
+# CPack is only used for the standalone `ninja package` flow; when building a
+# real Debian package debhelper installs the files itself.
+override_dh_auto_test:
+	:

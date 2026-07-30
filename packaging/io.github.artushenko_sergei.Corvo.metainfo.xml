@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2026 Serhii Artiushenko -->
+<component type="desktop-application">
+  <id>io.github.artushenko_sergei.Corvo</id>
+
+  <name>Corvo</name>
+  <summary>Desktop client for WhatsApp Web</summary>
+  <summary xml:lang="ru">Клиент WhatsApp Web для рабочего стола</summary>
+  <summary xml:lang="uk">Клієнт WhatsApp Web для стільниці</summary>
+
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+
+  <developer id="io.github.artushenko_sergei">
+    <name>Serhii Artiushenko</name>
+  </developer>
+
+  <description>
+    <p>
+      Corvo puts WhatsApp Web into a real desktop window instead of a browser tab:
+      a system tray icon with an unread counter, desktop notifications, remembered
+      window geometry and a session that is scanned once and then kept.
+    </p>
+    <p>Features:</p>
+    <ul>
+      <li>Tray icon with an unread-message badge; closing the window hides it to the tray</li>
+      <li>Desktop notifications through org.freedesktop.Notifications, clicking one opens the chat</li>
+      <li>Voice and video calls, with camera and microphone permissions granted automatically</li>
+      <li>Built-in camera and microphone check, so a broken device is easy to tell from a broken permission</li>
+      <li>Interface follows the language WhatsApp itself uses; English, German, Ukrainian and Russian are included</li>
+      <li>Optional autostart, page zoom, spell checking</li>
+      <li>Only web.whatsapp.com is allowed to load; every other link opens in the system browser</li>
+    </ul>
+    <p>
+      Corvo is an independent project and is not affiliated with, endorsed by or
+      sponsored by WhatsApp LLC or Meta Platforms, Inc. It only displays the public
+      web interface, and using that interface remains subject to WhatsApp's terms.
+    </p>
+    <p xml:lang="ru">
+      Corvo открывает WhatsApp Web в обычном окне рабочего стола, а не во вкладке
+      браузера: значок в системном трее со счётчиком непрочитанных, уведомления
+      рабочего стола, запомненная геометрия окна и сессия, которую нужно
+      подтвердить QR-кодом только один раз.
+    </p>
+    <p xml:lang="ru">
+      Corvo — независимый проект, не связанный с WhatsApp LLC и Meta Platforms, Inc.
+      и не одобренный ими. Программа лишь показывает публичный веб-интерфейс,
+      использование которого подчиняется правилам WhatsApp.
+    </p>
+  </description>
+
+  <launchable type="desktop-id">io.github.artushenko_sergei.Corvo.desktop</launchable>
+
+  <url type="homepage">https://github.com/Artushenko-Sergei/Corvo</url>
+  <url type="bugtracker">https://github.com/Artushenko-Sergei/Corvo/issues</url>
+  <url type="vcs-browser">https://github.com/Artushenko-Sergei/Corvo</url>
+
+  <screenshots>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/Artushenko-Sergei/Corvo/main/docs/screenshots/01-login.png</image>
+      <caption>Signing in by scanning the QR code once</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/Artushenko-Sergei/Corvo/main/docs/screenshots/02-settings.png</image>
+      <caption>Settings: language, tray behaviour, autostart, device check</caption>
+    </screenshot>
+  </screenshots>
+
+  <categories>
+    <category>Network</category>
+    <category>InstantMessaging</category>
+  </categories>
+
+  <keywords>
+    <keyword>WhatsApp</keyword>
+    <keyword>messenger</keyword>
+    <keyword>chat</keyword>
+    <keyword>calls</keyword>
+    <keyword translate="no">Qt</keyword>
+  </keywords>
+
+  <supports>
+    <control>pointing</control>
+    <control>keyboard</control>
+  </supports>
+
+  <recommends>
+    <display_length compare="ge">768</display_length>
+  </recommends>
+
+  <content_rating type="oars-1.1">
+    <content_attribute id="social-chat">intense</content_attribute>
+    <content_attribute id="social-audio">intense</content_attribute>
+  </content_rating>
+
+  <releases>
+    <release version="2.0.0" date="2026-07-30">
+      <description>
+        <p>First public release under the name Corvo.</p>
+        <ul>
+          <li>Voice and video calls work: the engine now exposes SharedArrayBuffer and the Encoded Transform API that WhatsApp checks for</li>
+          <li>The interface follows the language WhatsApp renders in and switches without a restart</li>
+          <li>Tray icon with unread badge, desktop notifications, autostart, camera and microphone diagnostics</li>
+        </ul>
+      </description>
+    </release>
+  </releases>
+</component>

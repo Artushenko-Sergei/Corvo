@@ -1,0 +1,23 @@
+# Build trees
+build/
+build-*/
+cmake-build-*/
+
+# Generated translation binaries (compiled from translations/*.ts at build time)
+*.qm
+
+# Packages
+*.deb
+*.AppImage
+*.flatpak
+
+# Editors / tooling
+.cache/
+.idea/
+.vscode/
+*.user
+compile_commands.json
+
+# OS noise
+.DS_Store
+*~

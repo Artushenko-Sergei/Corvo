@@ -1,0 +1,59 @@
+# Flatpak manifest for Corvo.
+#
+# The KDE runtime already contains Qt 6.11 including QtWebEngine, so nothing has
+# to be bundled: the resulting package is small and the version requirement of
+# the project (Qt >= 6.11) is satisfied by the runtime itself.
+#
+# Build and install locally with:
+#   flatpak install --user flathub org.kde.Sdk//6.11 org.kde.Platform//6.11
+#   flatpak-builder --user --install --force-clean build-flatpak \
+#       packaging/flatpak/io.github.artushenko_sergei.Corvo.yaml
+#   flatpak run io.github.artushenko_sergei.Corvo
+app-id: io.github.artushenko_sergei.Corvo
+runtime: org.kde.Platform
+runtime-version: "6.11"
+sdk: org.kde.Sdk
+command: Corvo
+
+finish-args:
+  # Windowing and rendering
+  - --share=ipc
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --device=dri
+  # WhatsApp Web itself
+  - --share=network
+  # Voice and video calls: audio plus access to /dev/video* for the camera.
+  # Flatpak has no camera-only device permission, so calls need --device=all.
+  - --socket=pulseaudio
+  - --device=all
+  # Desktop integration: notifications and the tray icon
+  - --talk-name=org.freedesktop.Notifications
+  - --talk-name=org.kde.StatusNotifierWatcher
+  - --talk-name=com.canonical.AppMenu.Registrar
+  # Attachments: send from and save to the usual user folders
+  - --filesystem=xdg-download
+  - --filesystem=xdg-pictures
+  - --filesystem=xdg-documents
+  # Autostart entry written by the settings dialog
+  - --filesystem=xdg-config/autostart:create
+
+cleanup:
+  - /include
+  - /lib/pkgconfig
+  - /share/doc
+  - "*.a"
+  - "*.la"
+
+modules:
+  - name: corvo
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+    sources:
+      - type: dir
+        path: ../..
+    post-install:
+      # Flathub keys everything off the application id.
+      - install -Dm644 packaging/io.github.artushenko_sergei.Corvo.metainfo.xml
+        ${FLATPAK_DEST}/share/metainfo/${FLATPAK_ID}.metainfo.xml

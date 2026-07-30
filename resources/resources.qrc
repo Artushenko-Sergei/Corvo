@@ -1,0 +1,17 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+  <qresource prefix="/">
+    <file>icons/Corvo.png</file>
+    <file>icons/Corvo.svg</file>
+    <file>icons/Corvo-16.png</file>
+    <file>icons/Corvo-22.png</file>
+    <file>icons/Corvo-24.png</file>
+    <file>icons/Corvo-32.png</file>
+    <file>icons/Corvo-48.png</file>
+    <file>icons/Corvo-64.png</file>
+    <file>icons/Corvo-128.png</file>
+    <file>icons/Corvo-256.png</file>
+    <file>icons/tray.png</file>
+    <file>html/devicecheck.html</file>
+  </qresource>
+</RCC>
