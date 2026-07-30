@@ -1,3 +1,9 @@
+corvo (2.0.1+30) unstable; urgency=medium
+
+  * README переписан для пользователей, техническая часть вынесена в docs/DEVELOPMENT.md
+
+ -- Serhii Artiushenko <artushenko@protonmail.com>  Fri, 31 Jul 2026 00:39:45 +0300
+
 corvo (2.0.1+29) unstable; urgency=medium
 
   * Добавлена ссылка на конверт Privat24 в метаданные AppStream и README. Убрано разрешение --filesystem=xdg-config/autostart:create, которое отклоняет линтер Flathub; в песочнице автозапуск отключён с подсказкой вместо молчаливого отказа.
