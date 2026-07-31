@@ -61,6 +61,9 @@ mkdir -p "$STAGE/$OPT"/{bin,lib,libexec,plugins,resources,translations} \
 DESTDIR="$STAGE" cmake --install "$BUILD" --prefix /usr --strip >/dev/null
 mv "$STAGE/usr/bin/Corvo" "$STAGE/$OPT/bin/Corvo"
 ln -sf "/$OPT/bin/Corvo" "$STAGE/usr/bin/corvo"
+# Прежние версии ставили бинарник в /usr/bin/Corvo; ярлыки и записи автозапуска
+# из них ссылаются на этот путь.
+ln -sf "/$OPT/bin/Corvo" "$STAGE/usr/bin/Corvo"
 
 cat > "$STAGE/$OPT/bin/qt.conf" <<'EOF'
 [Paths]

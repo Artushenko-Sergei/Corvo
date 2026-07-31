@@ -43,6 +43,28 @@ QString genericPath(QStandardPaths::StandardLocation location, const QString &le
     return QDir(base).filePath(leaf);
 }
 
+// Command for generated .desktop files. The running binary is used as is when it
+// is installed; from a build directory an installed copy is preferred, so the
+// entry keeps working after the build tree is gone.
+QString launchCommand()
+{
+    const QString running = QCoreApplication::applicationFilePath();
+    if (running.startsWith(QLatin1String("/usr/")) || running.startsWith(QLatin1String("/opt/")))
+        return running;
+
+    static const QStringList installed = {
+        QStringLiteral("/opt/corvo/bin/Corvo"),
+        QStringLiteral("/usr/bin/Corvo"),
+        QStringLiteral("/usr/bin/corvo"),
+        QStringLiteral("/usr/local/bin/Corvo"),
+    };
+    for (const QString &candidate : installed) {
+        if (QFileInfo::exists(candidate))
+            return candidate;
+    }
+    return running;
+}
+
 } // namespace
 
 Settings::Settings(QObject *parent)
@@ -363,9 +385,7 @@ bool Settings::installDesktopEntry()
     QFile::remove(svgTarget);
     QFile::copy(QStringLiteral(":/icons/Corvo.svg"), svgTarget);
 
-    QString exec = QStringLiteral("/usr/bin/Corvo");
-    if (!QFileInfo::exists(exec))
-        exec = QCoreApplication::applicationFilePath();
+    const QString exec = launchCommand();
 
     QFile file(entry);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
@@ -518,11 +538,7 @@ bool Settings::setAutostartEnabled(bool enabled)
 
     QDir().mkpath(QFileInfo(path).absolutePath());
 
-    // Prefer the installed binary; fall back to whatever is running right now
-    // (useful when testing straight out of the build directory).
-    QString exec = QStringLiteral("/usr/bin/Corvo");
-    if (!QFileInfo::exists(exec))
-        exec = QCoreApplication::applicationFilePath();
+    const QString exec = launchCommand();
 
     QFile file(path);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {

@@ -1,3 +1,9 @@
+corvo (2.0.3+34) unstable; urgency=medium
+
+  * ярлыки и автозапуск указывают на фактический путь бинарника; /usr/bin/Corvo как ссылка для совместимости
+
+ -- Serhii Artiushenko <artushenko@protonmail.com>  Fri, 31 Jul 2026 08:32:09 +0300
+
 corvo (2.0.2+33) unstable; urgency=medium
 
   * релиз для Flathub: тег в актуальной истории

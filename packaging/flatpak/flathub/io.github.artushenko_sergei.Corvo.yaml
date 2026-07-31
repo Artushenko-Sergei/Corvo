@@ -1,0 +1,67 @@
+# Манифест для подачи в Flathub: собирается из тега репозитория.
+# Локальная сборка из рабочей копии - packaging/flatpak/io.github.artushenko_sergei.Corvo.yaml
+#
+# QtWebEngine нет в org.kde.Platform, он приходит из io.qt.qtwebengine.BaseApp;
+# версия base обязана совпадать с версией рантайма.
+app-id: io.github.artushenko_sergei.Corvo
+runtime: org.kde.Platform
+runtime-version: "6.11"
+sdk: org.kde.Sdk
+base: io.qt.qtwebengine.BaseApp
+base-version: "6.11"
+command: Corvo
+
+finish-args:
+  # Окно и отрисовка
+  - --share=ipc
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --device=dri
+  # WhatsApp Web
+  - --share=network
+  # Звонки: звук и /dev/video* для камеры. Отдельного разрешения только на
+  # камеру в Flatpak нет, поэтому --device=all.
+  - --socket=pulseaudio
+  - --device=all
+  # Уведомления и значок в трее
+  - --talk-name=org.freedesktop.Notifications
+  - --talk-name=org.kde.StatusNotifierWatcher
+  - --talk-name=com.canonical.AppMenu.Registrar
+  # Вложения: отправить из обычных папок пользователя и сохранить в них
+  - --filesystem=xdg-download
+  - --filesystem=xdg-pictures
+  - --filesystem=xdg-documents
+  # Доступа к ~/.config/autostart нет: в песочнице автозапуск - дело портала
+  # org.freedesktop.portal.Background. Пока портал не реализован, переключатель
+  # автозапуска в сборке Flatpak выключен.
+  # QtWebEngine живёт в /app, оттуда же берутся его вспомогательный процесс и
+  # словари проверки орфографии.
+  - --env=QTWEBENGINEPROCESS_PATH=/app/bin/QtWebEngineProcess
+  - --env=QTWEBENGINE_DICTIONARIES_PATH=/app/qtwebengine_dictionaries
+
+cleanup-commands:
+  - /app/cleanup-BaseApp.sh
+
+cleanup:
+  - /include
+  - /lib/pkgconfig
+  - /share/doc
+  - "*.a"
+  - "*.la"
+
+modules:
+  - name: corvo
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      # Qt берётся из BaseApp в /app, а не из установки в домашнем каталоге,
+      # на которую проект настроен по умолчанию.
+      - -DCMAKE_PREFIX_PATH=/app;/usr
+    sources:
+      - type: git
+        url: https://github.com/Artushenko-Sergei/Corvo.git
+        tag: v2.0.2
+        commit: d932c1297f7fcd0b8ca560e6509a93ee99244a6c
+    post-install:
+      - install -Dm644 packaging/io.github.artushenko_sergei.Corvo.metainfo.xml
+        ${FLATPAK_DEST}/share/metainfo/${FLATPAK_ID}.metainfo.xml
