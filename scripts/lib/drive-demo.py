@@ -46,14 +46,14 @@ def main():
     win.set_input_focus(X.RevertToParent, X.CurrentTime)
     win.raise_window()
     dpy.sync()
-    time.sleep(6)                       # экран входа с QR-кодом
+    time.sleep(3)                       # экран входа с QR-кодом
 
     for _ in range(2):                  # масштаб +
         key(dpy, "plus", ["Control_L"])
     time.sleep(1.5)
     for _ in range(2):                  # масштаб -
         key(dpy, "minus", ["Control_L"])
-    time.sleep(1.5)
+    time.sleep(0.8)
 
     key(dpy, "F10")                     # меню «Файл»
     key(dpy, "Down")
@@ -61,9 +61,9 @@ def main():
     for _ in range(3):                  # -> «Настройки…»
         key(dpy, "Down")
     key(dpy, "Return")
-    time.sleep(6)
+    time.sleep(4)
     key(dpy, "Escape")
-    time.sleep(1.5)
+    time.sleep(1)
 
     key(dpy, "F10")                     # меню «Помощь»
     for _ in range(2):
@@ -71,14 +71,14 @@ def main():
     key(dpy, "Down")
     time.sleep(0.8)
     key(dpy, "Return")                  # -> «О программе»
-    time.sleep(6)
+    time.sleep(4)
     key(dpy, "Escape")
-    time.sleep(2)
+    time.sleep(1)
 
     key(dpy, "F11")                     # полный экран
-    time.sleep(3)
+    time.sleep(2.5)
     key(dpy, "F11")
-    time.sleep(2)
+    time.sleep(1.5)
     return 0
 
 
