@@ -95,10 +95,11 @@
   </content_rating>
 
   <releases>
-    <release version="2.0.2" date="2026-07-31">
+    <release version="2.0.4" date="2026-07-31">
       <description>
         <p>First Flathub release.</p>
         <ul>
+          <li>Generated desktop entries and the autostart file now point at the running binary, so they keep working wherever the application is installed</li>
           <li>Autostart is disabled in Flatpak builds: inside a sandbox it belongs to the Background portal, which is not implemented yet</li>
           <li>Documentation split into a user-facing README and developer notes</li>
         </ul>

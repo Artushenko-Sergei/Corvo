@@ -1,3 +1,9 @@
+corvo (2.0.4+35) unstable; urgency=medium
+
+  * запись о выпуске в AppStream синхронизирована с тегом
+
+ -- Serhii Artiushenko <artushenko@protonmail.com>  Fri, 31 Jul 2026 08:37:18 +0300
+
 corvo (2.0.3+34) unstable; urgency=medium
 
   * ярлыки и автозапуск указывают на фактический путь бинарника; /usr/bin/Corvo как ссылка для совместимости
