@@ -2,8 +2,6 @@
 build/
 build-*/
 cmake-build-*/
-.flatpak-builder/
-repo/
 
 # Generated translation binaries (compiled from translations/*.ts at build time)
 *.qm
@@ -11,7 +9,6 @@ repo/
 # Packages
 *.deb
 *.AppImage
-*.flatpak
 
 # Editors / tooling
 .cache/

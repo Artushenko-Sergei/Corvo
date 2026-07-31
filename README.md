@@ -59,9 +59,6 @@ sudo apt remove corvo
 
 Проверено на Debian 12 с KDE, в сеансах Wayland и X11.
 
-**Flatpak / Flathub** — пакет собран и проходит проверки Flathub, публикация
-готовится. Появится команда `flatpak install flathub io.github.artushenko_sergei.Corvo`.
-
 **Сборка из исходников** — см. [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
 
 ## Первый запуск

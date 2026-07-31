@@ -118,8 +118,7 @@ Corvo/
 │
 ├── packaging/                  # файлы названы по App ID
 │   ├── io.github.artushenko_sergei.Corvo.desktop
-│   ├── io.github.artushenko_sergei.Corvo.metainfo.xml   # AppStream для Flathub
-│   ├── flatpak/…Corvo.yaml     # манифест Flatpak
+│   ├── io.github.artushenko_sergei.Corvo.metainfo.xml   # AppStream
 │   └── deb/{postinst,postrm}   # обновление кэшей .desktop и иконок
 │
 ├── scripts/
@@ -269,7 +268,6 @@ dpkg-deb -x build/Corvo_2.0.1+30_amd64.deb /tmp/t
 | Вариант | Что даёт | Размер | Состояние |
 |---|---|---|---|
 | **Самодостаточный .deb** (`/opt/corvo`) | установка через `apt` на любой системе | 90 МБ пакет, 340 МБ на диске | ✅ `scripts/make-bundle-deb.sh` |
-| **Flatpak** | Qt и WebEngine из рантайма KDE + BaseApp | ~30 МБ + рантайм | ✅ см. раздел 6b |
 | **AppImage** (`linuxdeploy` + `linuxdeploy-plugin-qt`) | один файл на любом дистрибутиве | ~250 МБ | не собран |
 
 Сборка `dpkg-buildpackage` из каталога `debian/` рассчитана на дистрибутив, где
@@ -277,7 +275,7 @@ Qt ≥ 6.11 есть в репозитории (Debian trixie/sid).
 
 ---
 
-## 6a. Самодостаточный .deb
+## 6.1. Самодостаточный .deb
 
 ```bash
 scripts/make-bundle-deb.sh          # -> dist/corvo_<версия>_amd64.deb
@@ -332,55 +330,6 @@ bwrap --dev-bind / / --tmpfs "$HOME/opt" \
       --setenv XDG_DATA_HOME /tmp/t/data --setenv XDG_CONFIG_HOME /tmp/t/config \
       build-bundle/stage/opt/corvo/bin/Corvo
 ```
-
----
-
-## 6b. Flatpak
-
-Манифест — `packaging/flatpak/io.github.artushenko_sergei.Corvo.yaml`.
-
-Ключевой момент: **в `org.kde.Platform` нет QtWebEngine.** Его даёт отдельный
-`io.qt.qtwebengine.BaseApp`, поэтому в манифесте:
-
-```yaml
-runtime: org.kde.Platform
-runtime-version: '6.11'
-base: io.qt.qtwebengine.BaseApp
-base-version: '6.11'
-cleanup-commands: [ /app/cleanup-BaseApp.sh ]
-```
-
-Из BaseApp Qt попадает в `/app`, поэтому сборке нужен
-`-DCMAKE_PREFIX_PATH=/app;/usr`, а `finish-args` задаёт
-`QTWEBENGINEPROCESS_PATH=/app/bin/QtWebEngineProcess`.
-
-Debian-овский `flatpak-builder` 1.2 не умеет `appstream-compose` — нужен свежий,
-из Flatpak:
-
-```bash
-flatpak install -y flathub org.flatpak.Builder
-flatpak run --filesystem=$PWD org.flatpak.Builder --user --force-clean --install \
-    build-flatpak packaging/flatpak/io.github.artushenko_sergei.Corvo.yaml
-flatpak run io.github.artushenko_sergei.Corvo
-```
-
-Проверка перед подачей на Flathub (должно быть пусто):
-
-```bash
-flatpak run --command=flatpak-builder-lint org.flatpak.Builder \
-    manifest packaging/flatpak/io.github.artushenko_sergei.Corvo.yaml
-```
-
-**Автозапуск в Flatpak отключён.** Записывать в `~/.config/autostart` из песочницы
-нельзя — линтер Flathub отклоняет разрешение
-`xdg-config/autostart:create` (`finish-args-unnecessary-xdg-config-autostart-access`).
-Правильный путь — портал `org.freedesktop.portal.Background`; пока он не
-реализован, `Settings::autostartSupported()` возвращает `false` при наличии
-`/.flatpak-info`, и переключатель в настройках выключен с подсказкой.
-
-Профиль Flatpak-версии лежит отдельно, в
-`~/.var/app/io.github.artushenko_sergei.Corvo/`, — сессия из `.deb`-версии туда
-не переносится, потребуется новый QR-код.
 
 ---
 

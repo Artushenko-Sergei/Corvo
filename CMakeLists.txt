@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.21)
 
 project(Corvo
-    VERSION 2.0.6
+    VERSION 2.0.7
     DESCRIPTION "Native WhatsApp Web client for Linux (Qt 6 / Qt WebEngine)"
     HOMEPAGE_URL "https://github.com/Artushenko-Sergei/Corvo"
     LANGUAGES CXX)
@@ -25,11 +25,11 @@ project(Corvo
 # Everything downstream derives from these two lines: the C++ code, the About
 # dialog, --version, the log header, the .deb version and its file name.
 # ---------------------------------------------------------------------------
-# Reverse-DNS application id. Flathub keys everything off it: the .desktop
-# file, the icons and the AppStream metadata must all carry this name.
+# Reverse-DNS application id. The .desktop file, the icons and the AppStream
+# metadata all carry this name.
 set(CORVO_APP_ID "io.github.artushenko_sergei.Corvo")
 
-set(CORVO_BUILD 37)
+set(CORVO_BUILD 38)
 set(CORVO_VERSION_FULL "${PROJECT_VERSION}+${CORVO_BUILD}")
 
 set(CMAKE_CXX_STANDARD 17)
@@ -206,7 +206,7 @@ install(FILES resources/icons/Corvo-64.png
     DESTINATION ${CMAKE_INSTALL_DATADIR}/pixmaps
     RENAME ${CORVO_APP_ID}.png)
 
-# AppStream metadata: required by Flathub, also used by GNOME Software / Discover.
+# AppStream metadata: used by GNOME Software / Discover.
 install(FILES packaging/${CORVO_APP_ID}.metainfo.xml
     DESTINATION ${CMAKE_INSTALL_DATADIR}/metainfo)
 

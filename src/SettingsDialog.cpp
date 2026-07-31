@@ -81,13 +81,6 @@ SettingsDialog::SettingsDialog(Settings *settings, QWidget *parent)
         tr("Касается только автозапуска. Запуск из меню приложений всегда "
            "открывает окно."));
     m_autostart = new QCheckBox(tr("Запускать при входе в систему"), trayBox);
-    if (!Settings::autostartSupported()) {
-        // Flatpak: the entry would have to go through the Background portal.
-        m_autostart->setEnabled(false);
-        m_autostart->setToolTip(
-            tr("В версии Flatpak автозапуск настраивается средствами системы: "
-               "добавьте Corvo в автозапуск в настройках рабочего стола."));
-    }
     auto *trayLayout = new QVBoxLayout(trayBox);
     trayLayout->addWidget(m_trayEnabled);
     trayLayout->addWidget(m_closeToTray);

@@ -511,13 +511,6 @@ void Settings::setCustomUserAgent(const QString &userAgent)
 
 // ---- Autostart -------------------------------------------------------------
 
-bool Settings::autostartSupported()
-{
-    // Every Flatpak sandbox has this file; its presence is the documented way to
-    // detect one from inside.
-    return !QFileInfo::exists(QStringLiteral("/.flatpak-info"));
-}
-
 bool Settings::autostartEnabled() const
 {
     return QFileInfo::exists(autostartFilePath());
@@ -525,12 +518,6 @@ bool Settings::autostartEnabled() const
 
 bool Settings::setAutostartEnabled(bool enabled)
 {
-    if (!autostartSupported()) {
-        qCWarning(logSettings) << "Autostart is not available inside a sandbox; "
-                                 "the Background portal is not implemented yet";
-        return false;
-    }
-
     const QString path = autostartFilePath();
 
     if (!enabled) {

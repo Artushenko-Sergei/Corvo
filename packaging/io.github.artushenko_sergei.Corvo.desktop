@@ -9,8 +9,8 @@ GenericName[ru]=Клиент WhatsApp
 Comment=Unofficial WhatsApp Web client for Linux
 Comment[ru]=Неофициальный клиент WhatsApp Web для Linux
 # Command name, not an absolute path: the binary lives in /usr/bin after a plain
-# install, in /app/bin inside Flatpak, and in /opt/corvo/bin in the self-contained
-# package (where scripts/make-bundle-deb.sh rewrites these two lines).
+# install and in /opt/corvo/bin in the self-contained package, where
+# scripts/make-bundle-deb.sh rewrites these two lines.
 Exec=Corvo
 TryExec=Corvo
 Icon=io.github.artushenko_sergei.Corvo
