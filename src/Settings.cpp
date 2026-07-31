@@ -241,7 +241,12 @@ bool Settings::startHidden() const
 
 void Settings::setStartHidden(bool enabled)
 {
+    if (startHidden() == enabled)
+        return;
     m_settings.setValue(kStartHidden, enabled);
+    // The autostart entry carries --hidden, so it has to be rewritten.
+    if (autostartEnabled())
+        setAutostartEnabled(true);
 }
 
 // ---- Notifications ---------------------------------------------------------
@@ -554,7 +559,7 @@ bool Settings::setAutostartEnabled(bool enabled)
         << "Name=Corvo\n"
         << "GenericName=WhatsApp Client\n"
         << "Comment=Native WhatsApp Web client for Linux\n"
-        << "Exec=" << exec << " --hidden\n"
+        << "Exec=" << exec << (startHidden() ? " --hidden" : "") << "\n"
         << "Icon=" CORVO_APP_ID "\n"
         << "Terminal=false\n"
         << "Categories=Network;InstantMessaging;\n"

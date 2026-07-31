@@ -232,10 +232,11 @@ int main(int argc, char *argv[])
         window.showAndActivate();
     });
 
-    const bool startHidden = parser.isSet(hiddenOption) || settings.startHidden();
-    if (startHidden) {
+    // Hidden start is for autostart at login, which passes --hidden; launching
+    // the application by hand always shows the window. Without a tray icon there
+    // would be no way to bring it back, so the window is shown regardless.
+    if (parser.isSet(hiddenOption) && settings.trayEnabled()) {
         qCInfo(logApp) << "Starting hidden in the tray";
-        // Nothing to show: the tray icon is created by MainWindow itself.
     } else {
         window.show();
     }

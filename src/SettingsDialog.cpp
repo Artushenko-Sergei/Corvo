@@ -76,7 +76,10 @@ SettingsDialog::SettingsDialog(Settings *settings, QWidget *parent)
     m_trayEnabled = new QCheckBox(tr("Показывать значок в системном трее"), trayBox);
     m_closeToTray = new QCheckBox(tr("При закрытии окна скрывать в трей"), trayBox);
     m_minimizeToTray = new QCheckBox(tr("При минимизации скрывать в трей"), trayBox);
-    m_startHidden = new QCheckBox(tr("Запускать свёрнутым в трей"), trayBox);
+    m_startHidden = new QCheckBox(tr("При входе в систему запускать свёрнутым в трей"), trayBox);
+    m_startHidden->setToolTip(
+        tr("Касается только автозапуска. Запуск из меню приложений всегда "
+           "открывает окно."));
     m_autostart = new QCheckBox(tr("Запускать при входе в систему"), trayBox);
     if (!Settings::autostartSupported()) {
         // Flatpak: the entry would have to go through the Background portal.

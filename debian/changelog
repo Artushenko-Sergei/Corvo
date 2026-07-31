@@ -1,3 +1,9 @@
+corvo (2.0.5+36) unstable; urgency=medium
+
+  * запуск из меню всегда открывает окно; настройка «свёрнутым» касается только автозапуска
+
+ -- Serhii Artiushenko <artushenko@protonmail.com>  Fri, 31 Jul 2026 08:50:15 +0300
+
 corvo (2.0.4+35) unstable; urgency=medium
 
   * запись о выпуске в AppStream синхронизирована с тегом
