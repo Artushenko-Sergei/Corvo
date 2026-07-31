@@ -2,6 +2,8 @@
 # Выпуск: поднять версию, собрать пакет, поставить тег, опубликовать релиз.
 #
 #   scripts/release.sh build|patch|minor|major "описание изменения"
+#   scripts/release.sh current "описание"      - выпустить версию как есть,
+#                                                без поднятия (она уже поднята)
 #
 # Повторный запуск после сбоя безопасен: существующий тег и релиз не трогаются.
 set -euo pipefail
@@ -9,7 +11,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-KIND="${1:?укажите build|patch|minor|major}"
+KIND="${1:?укажите build|patch|minor|major|current}"
 NOTE="${2:?укажите описание изменения}"
 
 step() { printf '\n\033[1;36m==> %s\033[0m\n' "$*"; }
@@ -19,7 +21,11 @@ step "Что войдёт в выпуск"
 git status --short || true
 
 step "Версия"
-scripts/bump-version.sh "$KIND" "$NOTE"
+if [[ "$KIND" == current ]]; then
+    echo "    оставляю как есть"
+else
+    scripts/bump-version.sh "$KIND" "$NOTE"
+fi
 VERSION="$(grep -m1 -Po '^\s+VERSION \K[0-9.]+' CMakeLists.txt)"
 BUILDNO="$(grep -m1 -Po '^set\(CORVO_BUILD \K[0-9]+' CMakeLists.txt)"
 FULL="${VERSION}+${BUILDNO}"
