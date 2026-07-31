@@ -59,8 +59,8 @@ modules:
     sources:
       - type: git
         url: https://github.com/Artushenko-Sergei/Corvo.git
-        tag: v2.0.4
-        commit: b6e05e8337b6eb36e75e898be3458ce1c1573aeb
+        tag: v2.0.5
+        commit: 63c2cc9499053ba1fb777b5bae66c51ad4094f92
     post-install:
       - install -Dm644 packaging/io.github.artushenko_sergei.Corvo.metainfo.xml
         ${FLATPAK_DEST}/share/metainfo/${FLATPAK_ID}.metainfo.xml
