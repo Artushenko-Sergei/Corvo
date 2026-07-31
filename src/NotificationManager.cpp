@@ -160,7 +160,10 @@ uint NotificationManager::sendToDBus(const QString &title, const QString &body,
     const uint replacesId = tag.isEmpty() ? 0u : m_tagToId.value(tag, 0u);
 
     QVariantMap hints;
-    hints.insert(QStringLiteral("desktop-entry"), QStringLiteral("Corvo"));
+    // Basename of the installed .desktop file. Without a resolvable entry the
+    // notification is not attributed to this application, and clicking it
+    // activates whatever the server falls back to.
+    hints.insert(QStringLiteral("desktop-entry"), QStringLiteral(CORVO_APP_ID));
     hints.insert(QStringLiteral("category"), QStringLiteral("im.received"));
     hints.insert(QStringLiteral("urgency"), QVariant::fromValue<uchar>(1));
     hints.insert(QStringLiteral("sound-name"), QStringLiteral("message-new-instant"));
@@ -172,7 +175,7 @@ uint NotificationManager::sendToDBus(const QString &title, const QString &body,
         QStringLiteral("Notify"));
     call << QStringLiteral("Corvo")            // app_name
          << replacesId                             // replaces_id
-         << QStringLiteral("Corvo")            // app_icon (themed icon name)
+         << QStringLiteral(CORVO_APP_ID)       // app_icon: icons are installed under this name
          << (title.isEmpty() ? QStringLiteral("Corvo") : title)
          << body
          << actions

@@ -95,6 +95,11 @@
   </content_rating>
 
   <releases>
+    <release version="2.0.8" date="2026-07-31">
+      <description>
+        <p>Клик по уведомлению открывает Corvo: подсказка desktop-entry и имя иконки приведены к идентификатору приложения</p>
+      </description>
+    </release>
     <release version="2.0.7" date="2026-07-31">
       <description>
         <p>Поддержка Flatpak убрана: распространение только самодостаточным .deb</p>
