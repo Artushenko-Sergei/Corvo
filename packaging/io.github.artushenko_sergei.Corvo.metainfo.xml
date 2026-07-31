@@ -95,6 +95,11 @@
   </content_rating>
 
   <releases>
+    <release version="2.0.6" date="2026-07-31">
+      <description>
+        <p>Ярлык приложения указывает на имя команды: запуск из меню работает при любом варианте установки</p>
+      </description>
+    </release>
     <release version="2.0.5" date="2026-07-31">
       <description>
         <p>First Flathub release.</p>

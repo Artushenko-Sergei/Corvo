@@ -70,11 +70,16 @@ cat > "$STAGE/$OPT/bin/qt.conf" <<'EOF'
 Prefix = ..
 EOF
 
-# Exec должен указывать на реальный путь бинарника.
+# Имя команды заменяется на путь установки. Аргументы сохраняются: у действия
+# «Запустить в трее» это --hidden.
 DESKTOP="$STAGE/usr/share/applications/$APPID.desktop"
-sed -i -e "s|^Exec=.*|Exec=/$OPT/bin/Corvo %u|" \
-       -e "s|^TryExec=.*|TryExec=/$OPT/bin/Corvo|" "$DESKTOP"
-grep -q "^Exec=/$OPT/bin/Corvo" "$DESKTOP" || die ".desktop: Exec не подменился"
+sed -i -e "s|^Exec=Corvo|Exec=/$OPT/bin/Corvo|" \
+       -e "s|^TryExec=Corvo|TryExec=/$OPT/bin/Corvo|" "$DESKTOP"
+grep -q "^Exec=/$OPT/bin/Corvo --hidden$" "$DESKTOP" \
+    || die ".desktop: действие «в трее» потеряло --hidden"
+[[ $(grep -c "^Exec=/$OPT/bin/Corvo" "$DESKTOP") == 2 ]] \
+    || die ".desktop: Exec подменился не во всех строках"
+desktop-file-validate "$DESKTOP" || die ".desktop не проходит проверку"
 
 # --------------------------------------------------------------------------
 step "Библиотеки Qt (обход зависимостей)"
