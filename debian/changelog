@@ -1,3 +1,9 @@
+corvo (2.0.1+32) unstable; urgency=medium
+
+  * в описании установки убраны технические подробности, добавлена ссылка на скачивание
+
+ -- Serhii Artiushenko <artushenko@protonmail.com>  Fri, 31 Jul 2026 08:16:00 +0300
+
 corvo (2.0.1+31) unstable; urgency=medium
 
   * самодостаточный .deb с Qt внутри: устанавливается на любой Debian 12+/Ubuntu 22.04+ без Qt в системе
